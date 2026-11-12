@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6366f1">
+<title>LIHKET</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #070a12;
+  --panel: #0f172a;
+  --card: #182238;
+  --card-hover: #222f4c;
+  --soft: #111a2e;
+  --pri: #6366f1;
+  --pri-glow: rgba(99, 102, 241, 0.4);
+  --pri2: #4f46e5;
+  --sec: #0ea5e9;
+  --sec-glow: rgba(14, 165, 233, 0.35);
+  --tint: rgba(99, 102, 241, 0.16);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --line: rgba(255, 255, 255, 0.09);
+  --ok: #10b981;
+  --bad: #ef4444;
+  --amber: #f59e0b;
+  --shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+  --glass: rgba(24, 34, 56, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #f5f7fc;
+  --panel: #ffffff;
+  --card: #ffffff;
+  --card-hover: #f8fafc;
+  --soft: #f1f5f9;
+  --pri: #4f46e5;
+  --pri-glow: rgba(79, 70, 229, 0.25);
+  --pri2: #4338ca;
+  --sec: #0284c7;
+  --sec-glow: rgba(2, 132, 199, 0.2);
+  --tint: #eef2ff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --ok: #059669;
+  --bad: #dc2626;
+  --amber: #d97706;
+  --shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.08);
+  --glass: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.07);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', "Noto Sans Ethiopic", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.12) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(168, 85, 247, 0.05) 0px, transparent 60%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; }
+.ic { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.hidden { display: none !important; }
+
+/* Global Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(12px);
+}
+.theme-toggle:hover { transform: scale(1.12) rotate(15deg); border-color: var(--pri); }
+
+/* AUTHENTICATION UI WITH ANIMATED GRAPHICS */
+.auth { min-height: 100vh; display: grid; grid-template-columns: 1.15fr 1fr; position: relative; }
+
+.auth-hero {
+  background: linear-gradient(135deg, #0f0c29 0%, #1e1b4b 50%, #0369a1 100%);
+  color: #fff;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Animated Blobs */
+.auth-hero .blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: float 14s infinite ease-in-out alternate;
+}
+.auth-hero .blob-1 { width: 320px; height: 320px; background: var(--pri); top: -80px; right: -60px; animation-duration: 12s; }
+.auth-hero .blob-2 { width: 280px; height: 280px; background: var(--sec); bottom: -60px; left: -40px; animation-duration: 16s; }
+.auth-hero .blob-3 { width: 200px; height: 200px; background: #c084fc; top: 40%; left: 30%; animation-duration: 10s; }
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 40px) scale(1.1); }
+  100% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* Animated Graphics Card */
+.graphic-card {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  padding: 32px;
+  margin: 40px 0;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: cardPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes cardPulse {
+  0% { transform: translateY(0); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); }
+  100% { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(99, 102, 241, 0.25); }
+}
+
+.graphic-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.g-stat {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.g-stat .icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--pri), var(--sec));
+  display: grid;
+  place-items: center;
+}
+
+.logo { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 24px; letter-spacing: -0.5px; position: relative; z-index: 2; }
+.logo i {
+  width: 48px; height: 48px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--pri), var(--sec));
+  display: grid; place-items: center; font-style: normal; color: #fff;
+  box-shadow: 0 10px 24px var(--pri-glow);
+}
+
+.auth-hero h1 { font-size: 42px; line-height: 1.15; margin: 0 0 12px; font-weight: 800; letter-spacing: -1px; }
+.auth-hero p { opacity: 0.9; line-height: 1.6; max-width: 460px; margin: 0; font-size: 15px; }
+
+.auth-box { display: grid; place-items: center; padding: 40px 24px; position: relative; z-index: 2; }
+.auth-card {
+  width: 100%; max-width: 440px;
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  padding: 36px;
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.5s ease-out;
+}
+.auth-card h2 { margin: 0 0 6px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+.auth-card > p { margin: 0 0 24px; color: var(--muted); font-size: 14px; }
+
+/* Input Field Micro-interactions */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--soft); padding: 5px; border-radius: 16px; margin-bottom: 24px; border: 1px solid var(--line); }
+.tabs button { border: 0; padding: 11px; border-radius: 12px; font-weight: 600; font-size: 14px; color: var(--muted); transition: all 0.25s; }
+.tabs button.on { background: var(--card); color: var(--pri); box-shadow: var(--shadow); font-weight: 700; }
+.err { color: var(--bad); font-size: 13px; min-height: 20px; margin-top: 14px; font-weight: 600; text-align: center; }
+
+.fg { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.f { display: flex; flex-direction: column; gap: 6px; position: relative; }
+.f.full { grid-column: 1 / -1; }
+.f label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.f input, .f select {
+  width: 100%; padding: 13px 16px; background: var(--soft); border: 1px solid var(--line);
+  border-radius: 14px; outline: none; font-size: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); color: var(--text);
+}
+.f input:focus, .f select:focus { border-color: var(--pri); box-shadow: 0 0 0 4px var(--tint); background: var(--card); transform: translateY(-1px); }
+.f input[readonly] { opacity: 0.8; cursor: not-allowed; background: var(--soft); }
+
+/* Buttons & Interactive Elements */
+.btn {
+  border-radius: 14px; padding: 13px 22px; font-weight: 700; font-size: 14px;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+.btn:active { transform: translateY(0); scale: 0.98; }
+.b-pri { background: linear-gradient(135deg, var(--pri), var(--pri2)); color: #fff; box-shadow: 0 6px 20px var(--pri-glow); }
+.b-pri:hover { opacity: 0.95; box-shadow: 0 8px 25px var(--pri-glow); }
+.b-out { background: var(--card); border: 1px solid var(--line); color: var(--text); }
+.b-out:hover { background: var(--card-hover); border-color: var(--muted); }
+.b-bad { background: rgba(239, 68, 68, 0.12); color: var(--bad); border: 1px solid rgba(239, 68, 68, 0.3); }
+.b-bad:hover { background: rgba(239, 68, 68, 0.24); }
+.b-excel { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35); }
+.b-excel:hover { opacity: 0.95; }
+.wide { width: 100%; margin-top: 22px; }
+.acts { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+
+/* NAVIGATION & LAYOUT */
+.side {
+  width: 260px; background: var(--panel); border-right: 1px solid var(--line);
+  position: fixed; inset: 0 auto 0 0; padding: 26px 18px; display: flex; flex-direction: column; z-index: 20;
+  backdrop-filter: blur(16px);
+}
+.side .logo { padding: 4px 12px 30px; }
+.nb {
+  border: 0; background: none; display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 12px 16px; margin: 4px 0; border-radius: 14px; color: var(--muted); font-weight: 600; font-size: 14px; text-align: left; transition: all 0.2s;
+}
+.nb:hover { background: var(--soft); color: var(--text); }
+.nb.on { background: var(--tint); color: var(--pri); font-weight: 700; border-left: 4px solid var(--pri); border-radius: 4px 14px 14px 4px; }
+.side-b { margin-top: auto; border-top: 1px solid var(--line); padding-top: 18px; }
+
+.main { margin-left: 260px; padding: 36px 44px 70px; max-width: 1320px; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 32px; }
+.top h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+.top p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.me { display: flex; align-items: center; gap: 12px; background: var(--card); padding: 6px 16px 6px 6px; border-radius: 40px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+.av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--pri), var(--sec)); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 16px; }
+.me small { display: block; color: var(--muted); font-size: 12px; }
+
+/* SECTIONS & DASHBOARD UI */
+.sec { display: none; }
+.sec.on { display: block; animation: fadeInUp 0.4s ease-out; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 26px;
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+.ch { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; }
+.ch h3 { margin: 0; font-size: 17px; font-weight: 700; }
+.ch small { color: var(--muted); font-size: 13px; }
+
+.hero {
+  background: linear-gradient(135deg, var(--pri2) 0%, var(--pri) 55%, var(--sec) 100%);
+  color: #fff; border-radius: 26px; padding: 36px; margin-bottom: 28px; position: relative; overflow: hidden;
+  box-shadow: 0 16px 36px -10px var(--pri-glow);
+}
+.hero h2 { margin: 0 0 8px; font-size: 28px; font-weight: 800; }
+.hero p { margin: 0; opacity: 0.92; font-size: 15px; max-width: 560px; line-height: 1.6; }
+
+/* DASHBOARD STAT CARDS */
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-bottom: 28px; }
+.stat { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.stat:hover { transform: translateY(-4px); border-color: var(--pri); }
+.stat .l { color: var(--muted); font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.stat .l .ic { color: var(--pri); }
+.stat .v { font-size: 25px; font-weight: 800; margin-top: 14px; letter-spacing: -0.5px; }
+
+.stat.total-card {
+  background: linear-gradient(145deg, var(--card), var(--soft));
+  border: 2px solid var(--pri);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px var(--pri-glow);
+}
+.stat.total-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--pri), var(--sec));
+}
+
+.two { display: grid; grid-template-columns: 1.6fr 1fr; gap: 22px; }
+.chart { height: 290px; position: relative; }
+.tw { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 650px; }
+th, td { text-align: left; padding: 15px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+th { color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+tr:last-child td { border-bottom: 0; }
+tbody tr { transition: background 0.2s; }
+tbody tr:hover { background: var(--card-hover); }
+
+.pill { background: var(--tint); color: var(--pri); padding: 6px 14px; border-radius: 30px; font-weight: 700; font-size: 12px; display: inline-block; }
+.ib { border: 0; background: none; color: var(--muted); padding: 8px; border-radius: 10px; transition: all 0.2s; }
+.ib:hover { background: var(--soft); color: var(--pri); transform: scale(1.1); }
+.ib.d:hover { color: var(--bad); background: rgba(239, 68, 68, 0.15); }
+.empty { text-align: center; color: var(--muted); padding: 44px 10px; font-size: 14px; }
+
+.sl { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.si { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; background: var(--soft); border-radius: 16px; font-size: 14px; border: 1px solid transparent; transition: all 0.2s; }
+.si:hover { border-color: var(--line); transform: translateX(3px); }
+.si .r { display: flex; align-items: center; gap: 6px; }
+.si b { color: var(--pri); font-weight: 700; }
+.bar { height: 9px; background: var(--soft); border-radius: 10px; margin-top: 12px; overflow: hidden; }
+.bar div { height: 100%; background: linear-gradient(90deg, var(--pri), var(--sec)); border-radius: 10px; transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+.note { padding: 16px 20px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--amber); border-radius: 16px; font-size: 13px; line-height: 1.6; margin-bottom: 24px; }
+footer { text-align: center; color: var(--muted); font-size: 12px; padding: 40px 0 0; font-weight: 600; letter-spacing: 0.5px; }
+
+.toast {
+  position: fixed; bottom: 28px; right: 28px; background: var(--text); color: var(--bg);
+  padding: 15px 24px; border-radius: 16px; display: none; z-index: 100; font-size: 14px; font-weight: 700;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.bnav { display: none; }
+
+/* RESPONSIVE LAYOUT BREAKPOINTS */
+@media(max-width: 1180px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+@media(max-width: 900px) { .stats { grid-template-columns: repeat(2, 1fr); } .two { grid-template-columns: 1fr; } .main { padding: 24px 20px 60px; } }
+@media(max-width: 840px) { .auth { grid-template-columns: 1fr; } .auth-hero { display: none; } }
+@media(max-width: 700px) {
+  .side { display: none; }
+  .main { margin: 0; padding: 20px 16px 110px; }
+  .top h1 { font-size: 24px; }
+  .me div:last-child { display: none; }
+  .fg, .sl { grid-template-columns: 1fr; }
+  .hero { padding: 26px; } .hero h2 { font-size: 22px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .toast { left: 16px; right: 16px; bottom: calc(88px + env(safe-area-inset-bottom)); text-align: center; }
+  .bnav {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel);
+    border-top: 1px solid var(--line); padding: 10px 6px calc(10px + env(safe-area-inset-bottom)); z-index: 20;
+    backdrop-filter: blur(16px);
+  }
+  .bnav button { flex: 1; background: none; border: 0; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; }
+  .bnav button.on { color: var(--pri); }
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" title="Toggle theme"></button>
+
+<div class="auth" id="auth">
+  <div class="auth-hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="logo"><i>🎓</i>LIHKET</div>
+
+    <div>
+      <h1>Track every exam.<br>Build your future.</h1>
+      <p>Lihket Bridge Student System helps you record exam results, compute totals, evaluate averages, and export comprehensive Excel summaries.</p>
+
+      <div class="graphic-card">
+        <div style="font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 0.5px;">Live Performance Engine</div>
+        <div class="graphic-stats">
+          <div class="g-stat">
+            <div class="icon-box">📊</div>
+            <div>
+              <div style="font-size: 18px; font-weight: 800;">Real-time</div>
+              <div style="font-size: 11px; opacity: 0.75;">Total calculations</div>
+            </div>
+          </div>
+          <div class="g-stat">
+            <div class="icon-box">📗</div>
+            <div>
+              <div style="font-size: 18px; font-weight: 800;">Excel Ready</div>
+              <div style="font-size: 11px; opacity: 0.75;">Instant Export (.xlsx)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <small style="opacity:.75">LIHKET · v2.5</small>
+  </div>
+
+  <div class="auth-box">
+    <div class="auth-card">
+      <h2 id="authTitle">Welcome back</h2>
+      <p id="authSub">Log in to manage your student records.</p>
+      <div class="tabs"><button class="on" id="tabLogin" type="button">Log in</button><button id="tabReg" type="button">Create account</button></div>
+
+      <form id="loginForm" autocomplete="on">
+        <div class="fg">
+          <div class="f full"><label>Phone or Email</label><input id="lId" placeholder="e.g. 0912345678 or student@email.com" autocomplete="username" required></div>
+          <div class="f full"><label>Password</label><input id="lPw" type="password" autocomplete="current-password" required></div>
+        </div>
+        <button class="btn b-pri wide" type="submit">Log in</button>
+      </form>
+
+      <form id="regForm" class="hidden" autocomplete="on">
+        <div class="fg">
+          <div class="f full"><label>Full name</label><input id="rName" placeholder="e.g. Abebe Kebede" autocomplete="name" required></div>
+          <div class="f"><label>Grade / Class</label><input id="rGrade" placeholder="e.g. Grade 10" required></div>
+          <div class="f"><label>School (optional)</label><input id="rSchool" placeholder="e.g. Bridge Academy"></div>
+          <div class="f full"><label>Phone or Email</label><input id="rId" placeholder="Enter phone number or email" autocomplete="username" required></div>
+          <div class="f"><label>Password (6+ chars)</label><input id="rPw" type="password" autocomplete="new-password" minlength="6" required></div>
+          <div class="f"><label>Confirm password</label><input id="rPw2" type="password" autocomplete="new-password" required></div>
+        </div>
+        <button class="btn b-pri wide" type="submit">Create account</button>
+      </form>
+      <div class="err" id="authErr"></div>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+<aside class="side">
+  <div class="logo"><i>🎓</i>LIHKET</div>
+  <div id="sideNav"></div>
+  <div class="side-b"><button class="nb" data-act="logout"><svg class="ic" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Log out</button></div>
+</aside>
+
+<main class="main">
+  <header class="top">
+    <div><h1 id="pageTitle">Dashboard</h1><p id="today"></p></div>
+    <div class="me"><div class="av" id="avatar">S</div><div><b id="uName">Student</b><small id="uSub"></small></div></div>
+  </header>
+
+  <section class="sec on" id="dashboard">
+    <div class="hero">
+      <h2>Welcome back, <span id="wName">Student</span>!</h2>
+      <p>Your overall academic progress, exam scores, and score totals calculated automatically.</p>
+    </div>
+    
+    <div class="stats">
+      <div class="card stat total-card">
+        <div class="l">Total Score<svg class="ic" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <div class="v" id="sTotalScore">0 / 0</div>
+      </div>
+      <div class="card stat"><div class="l">Total exams<svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="v" id="sExams">0</div></div>
+      <div class="card stat"><div class="l">Overall average<svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></div><div class="v" id="sAvg">0%</div></div>
+      <div class="card stat"><div class="l">Highest score<svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg></div><div class="v" id="sHigh">0%</div></div>
+      <div class="card stat"><div class="l">Subjects<svg class="ic" viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19V5"/></svg></div><div class="v" id="sSubs">0</div></div>
+    </div>
+
+    <div class="two">
+      <div class="card"><div class="ch"><h3>Academic progress</h3><small>Last 10 exams</small></div><div class="chart"><canvas id="cProg"></canvas></div></div>
+      <div class="card"><div class="ch"><h3>Subject performance</h3><small>Average %</small></div><div id="dashSubs"></div></div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <div class="ch"><h3>Recent results</h3><button class="btn b-out" data-page="history">View all</button></div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Exam</th><th>Subject</th><th>Score / Total</th><th>Percent</th><th>Date</th></tr></thead>
+          <tbody id="recent"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="add">
+    <div class="card">
+      <div class="ch"><h3 id="formTitle">Add new exam result</h3><small>Enter your marks</small></div>
+      <div class="note">Enter your actual exam marks. Total obtained scores and percentages are computed automatically.</div>
+      <form id="resForm">
+        <div class="fg">
+          <div class="f"><label>Exam name</label><input id="exam" required placeholder="e.g. Midterm Exam"></div>
+          <div class="f"><label>Exam date</label><input id="date" type="date" required></div>
+          <div class="f"><label>Subject</label><select id="subject" required></select></div>
+          <div class="f hidden" id="customWrap"><label>Your subject name</label><input id="customSub" placeholder="e.g. Agriculture"></div>
+          <div class="f"><label>Score obtained</label><input id="score" type="number" min="0" step="0.01" required placeholder="e.g. 25"></div>
+          <div class="f"><label>Total marks (out of)</label><input id="outOf" type="number" min="0.01" step="0.01" required placeholder="e.g. 30"></div>
+          <div class="f"><label>Calculated percentage</label><input id="prev" readonly placeholder="Automatic"></div>
+        </div>
+        <div class="acts"><button class="btn b-pri" type="submit" id="saveBtn">Save result</button><button class="btn b-out" type="button" data-act="resetForm">Clear form</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="sec" id="history">
+    <div class="card">
+      <div class="ch">
+        <h3>Result history</h3>
+        <div style="display:flex; gap:10px;">
+          <button class="btn b-excel" data-act="exportExcel">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Export to Excel (.xlsx)
+          </button>
+          <button class="btn b-pri" data-page="add">+ Add result</button>
+        </div>
+      </div>
+      <div class="f" style="max-width:320px;margin-bottom:18px"><input id="search" placeholder="Search exam or subject..."></div>
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>Exam</th><th>Subject</th><th>Score</th><th>Out of</th><th>Percent</th><th>Date</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="hist"></tbody>
+          <tfoot id="histTotalFoot"></tfoot>
+        </table>
+      </div>
+      <div id="histEmpty" class="empty">No results recorded yet.</div>
+    </div>
+  </section>
+
+  <section class="sec" id="subjects">
+    <div class="card">
+      <div class="ch"><h3>My subjects</h3><small>Rename or remove subjects anytime</small></div>
+      <div class="sl" id="subList"></div>
+      <div style="margin-top:26px">
+        <div class="f"><label>Add a new subject</label><input id="newSub" placeholder="Enter subject name"></div>
+        <div class="acts"><button class="btn b-pri" data-act="addSub">Add subject</button><button class="btn b-out" data-act="restoreSubs">Restore defaults</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="analytics">
+    <div class="card">
+      <div class="ch"><h3>Performance analytics</h3><small>Subject-wise breakdown</small></div>
+      <div class="chart"><canvas id="cSub"></canvas></div>
+      <div class="sl" id="anSubs" style="margin-top:22px"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="settings">
+    <div class="card">
+      <div class="ch"><h3>My account</h3><small>Update your profile and phone/email</small></div>
+      <div class="fg">
+        <div class="f"><label>Full name</label><input id="sName"></div>
+        <div class="f"><label>Phone / Email (Login ID)</label><input id="sId" placeholder="Enter new phone or email"></div>
+        <div class="f"><label>Grade / Class</label><input id="sGrade"></div>
+        <div class="f"><label>School</label><input id="sSchool"></div>
+      </div>
+      <div class="acts"><button class="btn b-pri" data-act="saveProfile">Save changes</button><button class="btn b-out" data-act="logout">Log out</button></div>
+      
+      <hr style="border:0;border-top:1px solid var(--line);margin:30px 0">
+      
+      <h3 style="font-size:16px;margin:0 0 8px">Export Data</h3>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin:0">Export your exam scores directly to an Excel spreadsheet (`.xlsx`) format.</p>
+      <div class="acts">
+        <button class="btn b-excel" data-act="exportExcel">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Export Excel Report (.xlsx)
+        </button>
+      </div>
+      <div class="acts" style="margin-top:20px;"><button class="btn b-bad" data-act="clearAll">Delete all my results</button></div>
+    </div>
+  </section>
+  <footer>LIHKET · Version 2.5</footer>
+</main>
+
+<nav class="bnav" id="bnav"></nav>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ===== PASTE YOUR FIREBASE CONFIG HERE (replace the PASTE_... values) ===== */
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_AUTH_DOMAIN",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_STORAGE_BUCKET",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+/* ========================================================================= */
+</script>
+<script>
+const $ = id => document.getElementById(id);
+const DEFAULTS = ["Mathematics","English","Biology","Chemistry","Physics","Amharic","History","Geography","ICT","Civics","Economics"];
+const USERS_KEY = "lbss_users", SESSION_KEY = "lbss_session", OLD_KEY = "lbss_frontend_v1", OTHER = "__other__", THEME_KEY = "lbss_theme";
+
+const ICONS = {
+ dashboard: '<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',
+ add: '<path d="M12 5v14M5 12h14"/>',
+ history: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+ subjects: '<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19V5"/>',
+ analytics: '<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+ settings: '<path d="M20 21a8 8 0 10-16 0M12 11a4 4 0 100-8 4 4 0 000 8"/>',
+ edit: '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',
+ trash: '<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+ sun: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
+ moon: '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'
+};
+
+const ic = n => `<svg class="ic" viewBox="0 0 24 24">${ICONS[n]}</svg>`;
+const NAV = [["dashboard","Dashboard","Home"],["add","Add Result","Add"],["history","History","History"],["subjects","My Subjects","Subjects"],["analytics","Performance","Progress"],["settings","My Account","Account"]];
+const TITLES = {dashboard:"Dashboard",add:"Add Exam Result",history:"Result History",subjects:"My Subjects",analytics:"Performance",settings:"My Account"};
+
+let users = {}, uid = null, data = null, editingId = null, charts = {}, timer = null;
+
+/* Theme Toggle Control */
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeIcon(saved);
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', current);
+  localStorage.setItem(THEME_KEY, current);
+  updateThemeIcon(current);
+  if(charts.p) drawProgress();
+  if(charts.s && $("analytics").classList.contains("on")) renderAnalytics();
+}
+function updateThemeIcon(theme) {
+  $("themeToggle").innerHTML = ic(theme === 'light' ? 'moon' : 'sun');
+}
+$("themeToggle").onclick = toggleTheme;
+initTheme();
+
+function load(k,f){try{const v=JSON.parse(localStorage.getItem(k));return v===null||v===undefined?f:v}catch(e){return f}}
+function put(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast("Could not save to local storage.");return false}}
+function saveData(){
+  if(!uid||!data)return;
+  db.collection("users").doc(uid).set({subjects:data.subjects,results:data.results},{merge:true})
+    .catch(()=>toast("Could not save online. Check your internet."));
+}
+function saveUsers(){}
+function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(timer);timer=setTimeout(()=>t.style.display="none",2800)}
+function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c])}
+const pct = r => r.outOf > 0 ? (r.score / r.outOf) * 100 : 0;
+const avg = a => a.length ? a.reduce((s,r) => s + pct(r), 0) / a.length : 0;
+const fmt = n => Number(n).toFixed(2).replace(/\.00$/, "");
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+async function hash(p,salt){
+  if(window.crypto&&crypto.subtle){
+    const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(salt+p));
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+  }
+  return "plain:"+salt+p;
+}
+
+function authTab(login){
+  $("loginForm").classList.toggle("hidden",!login);
+  $("regForm").classList.toggle("hidden",login);
+  $("tabLogin").classList.toggle("on",login);$("tabReg").classList.toggle("on",!login);
+  $("authTitle").textContent=login?"Welcome back":"Create your account";
+  $("authSub").textContent=login?"Log in to see your results.":"Register to start tracking your exams.";
+  $("authErr").textContent="";
+}
+$("tabLogin").onclick=()=>authTab(true);
+$("tabReg").onclick=()=>authTab(false);
+
+let db = null, auth = null, registering = false;
+function cfgOk(){
+  if(!firebaseConfig.apiKey||firebaseConfig.apiKey.startsWith("PASTE")){
+    $("authErr").textContent="Firebase is not set up yet. Paste your firebaseConfig in the code.";
+    return false;
+  }
+  return true;
+}
+try{
+  if(!firebaseConfig.apiKey.startsWith("PASTE")){
+    firebase.initializeApp(firebaseConfig);
+    auth=firebase.auth();db=firebase.firestore();
+  }
+}catch(e){console.error(e)}
+
+function toEmail(raw){
+  raw=String(raw||"").trim().toLowerCase().replace(/\s+/g,"");
+  if(raw.includes("@"))return raw;
+  const d=raw.replace(/[^0-9+]/g,"");
+  return d.replace(/\D/g,"").length>=7?d.replace(/\+/g,"")+"@lihket.app":"";
+}
+function fromEmail(email){return String(email||"").replace(/@lihket\.app$/,"")}
+function authMsg(e){
+  const c=e&&e.code||"";
+  if(c==="auth/email-already-in-use")return "This phone or email is already registered.";
+  if(c==="auth/invalid-credential"||c==="auth/wrong-password"||c==="auth/user-not-found"||c==="auth/invalid-login-credentials")return "Wrong phone/email or password.";
+  if(c==="auth/weak-password")return "Password must be at least 6 characters.";
+  if(c==="auth/invalid-email")return "Please enter a valid phone number or email.";
+  if(c==="auth/network-request-failed")return "No internet connection. Try again.";
+  if(c==="auth/too-many-requests")return "Too many tries. Wait a few minutes and try again.";
+  return "Something went wrong. Please try again.";
+}
+
+$("regForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!cfgOk())return;
+  const raw=$("rId").value.trim().toLowerCase(),pw=$("rPw").value,email=toEmail(raw);
+  if(!email)return $("authErr").textContent="Please enter a valid phone number or email.";
+  if(pw.length<6)return $("authErr").textContent="Password must be at least 6 characters.";
+  if(pw!==$("rPw2").value)return $("authErr").textContent="Passwords do not match.";
+  const form=e.target;
+  registering=true;toast("Please wait...");
+  try{
+    const cred=await auth.createUserWithEmailAndPassword(email,pw);
+    // keep old phone-only data if this phone had it before
+    let local=load("lbss_data_"+raw,null);
+    if(!(local&&Array.isArray(local.subjects)&&Array.isArray(local.results))){
+      local=load(OLD_KEY,null);
+      if(!(local&&Array.isArray(local.subjects)&&Array.isArray(local.results)))local=null;
+    }
+    const prof={name:$("rName").value.trim(),grade:$("rGrade").value.trim(),school:$("rSchool").value.trim(),loginId:raw,
+      subjects:local?local.subjects:[...DEFAULTS],results:local?local.results:[]};
+    await db.collection("users").doc(cred.user.uid).set(prof);
+    form.reset();
+    enter(cred.user.uid,prof);toast("Account created. Welcome!");
+  }catch(err){
+    $("authErr").textContent=authMsg(err);
+  }finally{registering=false}
+});
+
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!cfgOk())return;
+  const email=toEmail($("lId").value);
+  if(!email)return $("authErr").textContent="Please enter a valid phone number or email.";
+  try{
+    await auth.signInWithEmailAndPassword(email,$("lPw").value);
+    e.target.reset();
+  }catch(err){
+    $("authErr").textContent=authMsg(err);
+  }
+});
+
+async function loadProfile(user){
+  const ref=db.collection("users").doc(user.uid),snap=await ref.get();
+  if(snap.exists)return snap.data();
+  const prof={name:fromEmail(user.email),grade:"",school:"",loginId:fromEmail(user.email),subjects:[...DEFAULTS],results:[]};
+  await ref.set(prof);return prof;
+}
+
+function enter(id,prof){
+  uid=id;
+  users={};users[uid]={name:prof.name||"",grade:prof.grade||"",school:prof.school||"",loginId:prof.loginId||""};
+  data=Array.isArray(prof.subjects)&&Array.isArray(prof.results)?{subjects:prof.subjects,results:prof.results}:{subjects:[...DEFAULTS],results:[]};
+  $("auth").classList.add("hidden");$("app").classList.remove("hidden");
+  $("authErr").textContent="";
+  fillProfile();populateSubjects();resetForm();refresh();showPage("dashboard");
+}
+
+function logout(){
+  if(auth)auth.signOut();
+  uid=null;data=null;users={};
+  $("app").classList.add("hidden");$("auth").classList.remove("hidden");authTab(true);
+}
+
+function fillProfile(){
+  const u=users[uid];
+  $("uName").textContent=u.name;$("wName").textContent=u.name.split(" ")[0]||u.name;
+  $("uSub").textContent=[u.grade,u.school].filter(Boolean).join(" · ");
+  $("avatar").textContent=(u.name[0]||"S").toUpperCase();
+  $("sName").value=u.name;
+  $("sId").value=u.loginId||"";$("sId").readOnly=true;
+  $("sGrade").value=u.grade||"";
+  $("sSchool").value=u.school||"";
+}
+
+function saveProfile(){
+  const name=$("sName").value.trim();
+  if(!name)return toast("Please enter your full name.");
+  const grade=$("sGrade").value.trim(),school=$("sSchool").value.trim();
+  Object.assign(users[uid],{name,grade,school});
+  db.collection("users").doc(uid).set({name,grade,school},{merge:true})
+    .then(()=>toast("Profile updated successfully!"))
+    .catch(()=>toast("Could not save online. Check your internet."));
+  fillProfile();
+}
+
+function buildNav(){
+  $("sideNav").innerHTML=NAV.map(n=>`<button class="nb" data-page="${n[0]}">${ic(n[0])}${n[1]}</button>`).join("");
+  $("bnav").innerHTML=NAV.map(n=>`<button data-page="${n[0]}">${ic(n[0])}${n[2]}</button>`).join("");
+}
+
+function showPage(p){
+  document.querySelectorAll(".sec").forEach(x=>x.classList.remove("on"));
+  $(p).classList.add("on");
+  document.querySelectorAll(".nb[data-page],#bnav [data-page]").forEach(x=>x.classList.toggle("on",x.dataset.page===p));
+  $("pageTitle").textContent=TITLES[p];
+  if(p==="analytics")renderAnalytics();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function populateSubjects(){
+  const s=$("subject"),cur=s.value;
+  s.innerHTML=data.subjects.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")+`<option value="${OTHER}">＋ Other (type my own subject)</option>`;
+  if(data.subjects.includes(cur))s.value=cur;
+  toggleCustom();renderSubjects();
+}
+
+function toggleCustom(){
+  const o=$("subject").value===OTHER;
+  $("customWrap").classList.toggle("hidden",!o);
+  $("customSub").required=o;
+  if(o)setTimeout(()=>$("customSub").focus(),50);
+}
+$("subject").addEventListener("change",toggleCustom);
+
+function renderSubjects(){
+  $("subList").innerHTML=data.subjects.map((s,i)=>{
+    const a=data.results.filter(r=>r.subject===s);
+    return `<div class="si"><span>${esc(s)}</span><div class="r"><b>${a.length?fmt(avg(a))+"%":"—"}</b>
+    <button class="ib" title="Rename" data-act="renSub" data-i="${i}">${ic("edit")}</button>
+    <button class="ib d" title="Delete" data-act="delSub" data-i="${i}">${ic("trash")}</button></div></div>`;
+  }).join("");
+}
+
+function addSub(){
+  const n=$("newSub").value.trim();
+  if(!n)return toast("Enter a subject name.");
+  if(data.subjects.some(s=>s.toLowerCase()===n.toLowerCase()))return toast("Subject already exists.");
+  data.subjects.push(n);saveData();$("newSub").value="";populateSubjects();refresh();toast("Subject added.");
+}
+
+function renSub(i){
+  const old=data.subjects[i],n=(prompt("New name for subject:",old)||"").trim();
+  if(!n||n===old)return;
+  if(data.subjects.some((s,j)=>j!==i&&s.toLowerCase()===n.toLowerCase()))return toast("Subject already exists.");
+  data.subjects[i]=n;data.results=data.results.map(r=>r.subject===old?{...r,subject:n}:r);
+  saveData();populateSubjects();refresh();toast("Subject renamed.");
+}
+
+function delSub(i){
+  const n=data.subjects[i],c=data.results.filter(r=>r.subject===n).length;
+  if(!confirm(c?`Delete "${n}" and its ${c} result(s)?`:`Delete "${n}"?`))return;
+  data.subjects.splice(i,1);data.results=data.results.filter(r=>r.subject!==n);
+  saveData();populateSubjects();refresh();toast("Subject deleted.");
+}
+
+function restoreSubs(){
+  if(!confirm("Restore default subjects?"))return;
+  data.subjects=[...DEFAULTS];data.results=data.results.filter(r=>data.subjects.includes(r.subject));
+  saveData();populateSubjects();refresh();toast("Defaults restored.");
+}
+
+function resetForm(){
+  editingId=null;$("resForm").reset();$("prev").value="";
+  $("formTitle").textContent="Add new exam result";$("saveBtn").textContent="Save result";
+  $("date").value=new Date().toISOString().slice(0,10);toggleCustom();
+}
+
+function preview(){
+  const s=Number($("score").value),o=Number($("outOf").value);
+  $("prev").value=o>0&&s>=0&&s<=o?fmt(s/o*100)+"%":"";
+}
+$("score").addEventListener("input",preview);$("outOf").addEventListener("input",preview);
+
+$("resForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const score=Number($("score").value),outOf=Number($("outOf").value);
+  if(score<0||outOf<=0||score>outOf)return toast("Please enter valid marks.");
+  let subject=$("subject").value;
+  if(subject===OTHER){
+    const n=$("customSub").value.trim();
+    if(!n)return toast("Type your subject name.");
+    const ex=data.subjects.find(s=>s.toLowerCase()===n.toLowerCase());
+    if(ex)subject=ex;else{data.subjects.push(n);subject=n}
+  }
+  const rec={id:editingId||String(Date.now()),exam:$("exam").value.trim(),date:$("date").value,subject,score,outOf};
+  if(!rec.exam||!rec.date)return;
+  if(editingId){data.results=data.results.map(r=>r.id===editingId?rec:r);toast("Result updated.")}
+  else{data.results.push(rec);toast("Result saved.")}
+  saveData();populateSubjects();resetForm();refresh();showPage("dashboard");
+});
+
+function editRes(id){
+  const r=data.results.find(x=>x.id===id);if(!r)return;
+  editingId=id;showPage("add");
+  $("exam").value=r.exam;$("date").value=r.date;$("subject").value=r.subject;toggleCustom();
+  $("score").value=r.score;$("outOf").value=r.outOf;preview();
+  $("formTitle").textContent="Edit exam result";$("saveBtn").textContent="Update result";
+}
+
+function delRes(id){
+  if(!confirm("Delete this result?"))return;
+  data.results=data.results.filter(r=>r.id!==id);saveData();refresh();toast("Result deleted.");
+}
+
+function refresh(){updateDash();renderHistory();renderSubjects()}
+
+function updateDash(){
+  const R = data.results;
+  const totalScoreObtained = R.reduce((sum, r) => sum + Number(r.score || 0), 0);
+  const totalPossibleScore = R.reduce((sum, r) => sum + Number(r.outOf || 0), 0);
+  
+  $("sTotalScore").textContent = `${fmt(totalScoreObtained)} / ${fmt(totalPossibleScore)}`;
+  $("sExams").textContent = R.length;
+  $("sAvg").textContent = fmt(avg(R)) + "%";
+  $("sHigh").textContent = fmt(R.length ? Math.max(...R.map(pct)) : 0) + "%";
+  $("sSubs").textContent = data.subjects.length;
+
+  const rec = [...R].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 5);
+  $("recent").innerHTML = rec.length ? rec.map(r => 
+    `<tr><td>${esc(r.exam)}</td><td>${esc(r.subject)}</td><td><b>${fmt(r.score)}</b> / ${fmt(r.outOf)}</td><td><span class="pill">${fmt(pct(r))}%</span></td><td>${esc(r.date)}</td></tr>`
+  ).join("") : '<tr><td colspan="5" class="empty">No results yet. Add your first exam.</td></tr>';
+
+  const used = data.subjects.map(s => ({n:s, a:data.results.filter(r => r.subject === s)})).filter(x => x.a.length);
+  $("dashSubs").innerHTML = used.length ? used.map(x => 
+    `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${esc(x.n)}</span><b>${fmt(avg(x.a))}%</b></div><div class="bar"><div style="width:${Math.min(100, avg(x.a))}%"></div></div></div>`
+  ).join("") : '<div class="empty">Subject averages will appear here.</div>';
+
+  drawProgress();
+}
+
+function chartOpts(){
+  const m = css("--muted"), l = css("--line");
+  return {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: m, maxRotation: 45 }, grid: { display: false } },
+      y: { min: 0, max: 100, ticks: { color: m }, grid: { color: l } }
+    }
+  };
+}
+
+function drawProgress(){
+  if(!window.Chart) return;
+  const s = [...data.results].sort((a,b) => a.date.localeCompare(b.date)).slice(-10);
+  if(charts.p) charts.p.destroy();
+  charts.p = new Chart($("cProg"), {
+    type: "line",
+    data: {
+      labels: s.map(r => r.subject + " · " + r.date),
+      datasets: [{
+        data: s.map(pct),
+        borderColor: css("--pri"),
+        backgroundColor: "rgba(99, 102, 241, 0.15)",
+        fill: true,
+        tension: 0.35,
+        pointBackgroundColor: css("--pri")
+      }]
+    },
+    options: chartOpts()
+  });
+}
+
+function renderHistory(){
+  const q = $("search").value.toLowerCase();
+  const rows = data.results.filter(r => (r.exam + " " + r.subject).toLowerCase().includes(q)).sort((a,b) => b.date.localeCompare(a.date));
+  
+  $("hist").innerHTML = rows.map(r => 
+    `<tr><td>${esc(r.exam)}</td><td>${esc(r.subject)}</td><td>${fmt(r.score)}</td><td>${fmt(r.outOf)}</td><td><span class="pill">${fmt(pct(r))}%</span></td><td>${esc(r.date)}</td><td style="white-space:nowrap"><button class="ib" title="Edit" data-act="editRes" data-id="${esc(r.id)}">${ic("edit")}</button><button class="ib d" title="Delete" data-act="delRes" data-id="${esc(r.id)}">${ic("trash")}</button></td></tr>`
+  ).join("");
+  
+  if (rows.length > 0) {
+    const sumScore = rows.reduce((s, r) => s + Number(r.score), 0);
+    const sumOutOf = rows.reduce((s, r) => s + Number(r.outOf), 0);
+    const overallPct = sumOutOf > 0 ? (sumScore / sumOutOf) * 100 : 0;
+    $("histTotalFoot").innerHTML = `
+      <tr style="font-weight: 800; background: var(--soft); border-top: 2px solid var(--line);">
+        <td colspan="2" style="text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; color: var(--pri);">Total Summary</td>
+        <td style="color: var(--pri);">${fmt(sumScore)}</td>
+        <td>${fmt(sumOutOf)}</td>
+        <td><span class="pill" style="background:var(--pri); color:#fff;">${fmt(overallPct)}% Avg</span></td>
+        <td colspan="2"></td>
+      </tr>
+    `;
+  } else {
+    $("histTotalFoot").innerHTML = "";
+  }
+  
+  $("histEmpty").style.display = rows.length ? "none" : "block";
+}
+
+$("search").addEventListener("input", () => data && renderHistory());
+
+function renderAnalytics(){
+  const st = data.subjects.map(s => ({n:s, a:avg(data.results.filter(r => r.subject === s))}));
+  $("anSubs").innerHTML = st.map(s => `<div class="si"><span>${esc(s.n)}</span><b>${fmt(s.a)}%</b></div>`).join("");
+  if(!window.Chart) return;
+  if(charts.s) charts.s.destroy();
+  charts.s = new Chart($("cSub"), {
+    type: "bar",
+    data: {
+      labels: st.map(s => s.n),
+      datasets: [{ data: st.map(s => s.a), backgroundColor: css("--pri"), borderRadius: 8 }]
+    },
+    options: chartOpts()
+  });
+}
+
+function exportToExcel() {
+  if (!data || !data.results || data.results.length === 0) {
+    return toast("No exam results available to export.");
+  }
+
+  try {
+    const wb = XLSX.utils.book_new();
+
+    const excelData = data.results.map((r, index) => ({
+      "No.": index + 1,
+      "Exam Name": r.exam,
+      "Subject": r.subject,
+      "Score Obtained": Number(fmt(r.score)),
+      "Total Marks": Number(fmt(r.outOf)),
+      "Percentage (%)": Number(fmt(pct(r))),
+      "Date": r.date
+    }));
+
+    const totalScore = data.results.reduce((sum, r) => sum + Number(r.score), 0);
+    const totalPossible = data.results.reduce((sum, r) => sum + Number(r.outOf), 0);
+    const totalAvgPct = totalPossible > 0 ? (totalScore / totalPossible) * 100 : 0;
+
+    excelData.push({
+      "No.": "TOTAL",
+      "Exam Name": "Overall Marks Summary",
+      "Subject": "-",
+      "Score Obtained": Number(fmt(totalScore)),
+      "Total Marks": Number(fmt(totalPossible)),
+      "Percentage (%)": Number(fmt(totalAvgPct)),
+      "Date": "-"
+    });
+
+    const wsResults = XLSX.utils.json_to_sheet(excelData);
+    wsResults['!cols'] = [
+      { wch: 6 },
+      { wch: 24 },
+      { wch: 20 },
+      { wch: 16 },
+      { wch: 14 },
+      { wch: 16 },
+      { wch: 14 }
+    ];
+
+    XLSX.utils.book_append_sheet(wb, wsResults, "Exam Results");
+
+    const subjectData = data.subjects.map(s => {
+      const subResults = data.results.filter(r => r.subject === s);
+      return {
+        "Subject": s,
+        "Exams Recorded": subResults.length,
+        "Average (%)": subResults.length ? Number(fmt(avg(subResults))) : 0
+      };
+    });
+
+    const wsSubjects = XLSX.utils.json_to_sheet(subjectData);
+    wsSubjects['!cols'] = [{ wch: 22 }, { wch: 16 }, { wch: 16 }];
+    XLSX.utils.book_append_sheet(wb, wsSubjects, "Subject Averages");
+
+    const u = users[uid] || {};
+    const safeName = (u.name || "Student").replace(/[^a-z0-9]/gi, '_');
+    const filename = `LIHKET_Student_Results_${safeName}.xlsx`;
+
+    XLSX.writeFile(wb, filename);
+    toast("Excel sheet exported successfully!");
+  } catch (err) {
+    console.error(err);
+    toast("Failed to export Excel spreadsheet.");
+  }
+}
+
+function clearAll(){
+  if(!confirm("Permanently delete all results?")) return;
+  data.results = []; saveData(); refresh(); toast("All results deleted.");
+}
+
+document.addEventListener("click", e => {
+  const p = e.target.closest("[data-page]");
+  if(p && data){ showPage(p.dataset.page); return }
+  const b = e.target.closest("[data-act]"); if(!b) return;
+  const A = {
+    logout, resetForm, addSub, restoreSubs, saveProfile, clearAll,
+    exportExcel: exportToExcel,
+    renSub: () => renSub(+b.dataset.i), delSub: () => delSub(+b.dataset.i),
+    editRes: () => editRes(b.dataset.id), delRes: () => delRes(b.dataset.id)
+  };
+  if(A[b.dataset.act]) A[b.dataset.act]();
+});
+
+buildNav();
+$("today").textContent = new Date().toLocaleDateString(undefined, {weekday: "long", year: "numeric", month: "long", day: "numeric"});
+if(auth){
+  auth.onAuthStateChanged(async user=>{
+    if(registering)return;
+    if(user){
+      try{const prof=await loadProfile(user);enter(user.uid,prof)}
+      catch(e){toast("Could not load your data. Check your internet.")}
+    }else{
+      $("app").classList.add("hidden");$("auth").classList.remove("hidden");
+    }
+  });
+}
+</script>
+</body>
+</html>
